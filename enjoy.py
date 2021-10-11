@@ -268,7 +268,7 @@ def main():  # noqa: C901
     obs = np.array(save_episode_obs).reshape(len(save_episode_obs), -1)
     acts = np.array(save_episode_acts).reshape(len(save_episode_acts), -1)
     print(obs.shape, acts.shape)
-    episodes = np.vstack((obs, acts))
+    episodes = np.hstack((obs, acts))
     print("Episode shape: ", episodes.shape)
     np.save("{}/expert_{}".format(log_path, args.env), episodes)
 
