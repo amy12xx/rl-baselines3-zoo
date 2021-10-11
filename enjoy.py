@@ -260,6 +260,8 @@ def main():  # noqa: C901
     env.close()
 
     #save episodes
+    save_episode_obs = [obs for ep in save_episode_obs for obs in ep]
+    save_episode_acts = [act for ep in save_episode_acts for act in ep]
     obs = np.array(save_episode_obs)
     acts = np.array(save_episode_acts)
     print(obs.shape, acts.shape)
