@@ -259,6 +259,12 @@ def main():  # noqa: C901
 
     env.close()
 
+    #save episodes
+    obs = np.array(save_episode_obs)
+    acts = np.array(save_episode_acts)
+    episodes = np.vstack((obs, acts))
+    np.save("expert_{}".format(args.env), episodes)
+
 
 if __name__ == "__main__":
     main()
