@@ -197,6 +197,7 @@ def main():  # noqa: C901
     successes = []
     try:
         for _ in range(args.n_timesteps):
+            print(1)
             action, state = model.predict(obs, state=state, deterministic=deterministic)
             obs, reward, done, infos = env.step(action)
             ep_acts.append(action)
