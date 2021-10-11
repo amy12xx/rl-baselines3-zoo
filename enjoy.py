@@ -184,6 +184,7 @@ def main():  # noqa: C901
 
     obs = env.reset()
     ep_obs.append(obs)
+    print("Obs shape: ", obs.shape)
 
     # Deterministic by default except for atari games
     stochastic = args.stochastic or is_atari and not args.deterministic
