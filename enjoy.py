@@ -197,7 +197,6 @@ def main():  # noqa: C901
     successes = []
     try:
         for _ in range(args.n_timesteps):
-            print(1)
             action, state = model.predict(obs, state=state, deterministic=deterministic)
             obs, reward, done, infos = env.step(action)
             ep_acts.append(action)
@@ -219,6 +218,7 @@ def main():  # noqa: C901
 
                 if done:
                     if episode_reward >= args.reward_threshold:
+                        assert len(ep_obs) == len(ep_acts)
                         save_episode_obs.append(ep_obs)
                         save_episode_acts.append(ep_acts)
                     ep_obs, ep_acts = [], []
