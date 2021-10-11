@@ -218,7 +218,7 @@ def main():  # noqa: C901
 
                 if done:
                     if episode_reward >= args.reward_threshold:
-                        assert len(ep_obs) == len(ep_acts)
+                        assert len(ep_obs) == len(ep_acts), "len not same: {}, {}".format(len(ep_obs), len(ep_acts))
                         save_episode_obs.append(ep_obs)
                         save_episode_acts.append(ep_acts)
                     ep_obs, ep_acts = [], []
