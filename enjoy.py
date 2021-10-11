@@ -217,6 +217,7 @@ def main():  # noqa: C901
                         print("Atari Episode Length", episode_infos["l"])
 
                 if done:
+                    print(len(ep_obs), len(ep_acts))
                     if episode_reward >= args.reward_threshold:
                         assert len(ep_obs) == len(ep_acts), "len not same: {}, {}".format(len(ep_obs), len(ep_acts))
                         save_episode_obs.append(ep_obs)
