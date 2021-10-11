@@ -217,7 +217,6 @@ def main():  # noqa: C901
                         print("Atari Episode Length", episode_infos["l"])
 
                 if done:
-                    print(len(ep_obs), len(ep_acts))
                     if episode_reward >= args.reward_threshold:
                         assert len(ep_obs) == len(ep_acts), "len not same: {}, {}".format(len(ep_obs), len(ep_acts))
                         save_episode_obs.append(ep_obs)
@@ -266,7 +265,6 @@ def main():  # noqa: C901
     #save episodes
     save_episode_obs = [obs for ep in save_episode_obs for obs in ep]
     save_episode_acts = [act for ep in save_episode_acts for act in ep]
-    print('after flattening: ', obs.shape, acts.shape)
     obs = np.array(save_episode_obs)
     acts = np.array(save_episode_acts)
     print(obs.shape, acts.shape)
