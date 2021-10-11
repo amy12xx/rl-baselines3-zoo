@@ -183,7 +183,7 @@ def main():  # noqa: C901
     ep_obs, ep_acts = [], []
 
     obs = env.reset()
-    ep_obs.append(obs)
+    ep_obs.append(obs["observation"])
     print("Obs shape: ", obs.shape)
 
     # Deterministic by default except for atari games
@@ -224,9 +224,9 @@ def main():  # noqa: C901
                         save_episode_acts.append(ep_acts)
                     ep_obs, ep_acts = [], []
                     obs = env.reset()
-                    ep_obs.append(obs)
+                    ep_obs.append(obs["observation"])
                 else:
-                    ep_obs.append(obs)
+                    ep_obs.append(obs["observation"])
 
                 if done and not is_atari and args.verbose > 0:
                     # NOTE: for env using VecNormalize, the mean reward
