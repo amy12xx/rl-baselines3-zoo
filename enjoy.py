@@ -223,6 +223,8 @@ def main():  # noqa: C901
                         save_episode_obs.append(ep_obs)
                         save_episode_acts.append(ep_acts)
                     ep_obs, ep_acts = [], []
+                    obs = env.reset()
+                    ep_obs.append(obs)
                 else:
                     ep_obs.append(obs)
 
