@@ -262,6 +262,7 @@ def main():  # noqa: C901
     #save episodes
     obs = np.array(save_episode_obs)
     acts = np.array(save_episode_acts)
+    print(obs.shape, acts.shape)
     episodes = np.vstack((obs, acts))
     np.save("{}/expert_{}".format(log_path, args.env), episodes)
 
