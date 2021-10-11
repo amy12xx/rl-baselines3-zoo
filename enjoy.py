@@ -60,6 +60,8 @@ def main():  # noqa: C901
     parser.add_argument(
         "--env-kwargs", type=str, nargs="+", action=StoreDict, help="Optional keyword argument to pass to the env constructor"
     )
+    parser.add_argument("--save-episodes", action="store_true", default=False, help="Save episodes")
+    parser.add_argument("--reward-threshold", help="Reward threshold", type=int, default=0)
     args = parser.parse_args()
 
     # Going through custom gym packages to let them register in the global registory
@@ -177,7 +179,11 @@ def main():  # noqa: C901
 
     model = ALGOS[algo].load(model_path, env=env, custom_objects=custom_objects, **kwargs)
 
+    save_episode_obs, save_episode_acts = [], []
+    ep_obs, ep_acts = [], []
+
     obs = env.reset()
+    ep_obs.append(obs)
 
     # Deterministic by default except for atari games
     stochastic = args.stochastic or is_atari and not args.deterministic
@@ -193,6 +199,8 @@ def main():  # noqa: C901
         for _ in range(args.n_timesteps):
             action, state = model.predict(obs, state=state, deterministic=deterministic)
             obs, reward, done, infos = env.step(action)
+            ep_acts.append(action)
+
             if not args.no_render:
                 env.render("human")
 
@@ -207,6 +215,14 @@ def main():  # noqa: C901
                     if episode_infos is not None:
                         print(f"Atari Episode Score: {episode_infos['r']:.2f}")
                         print("Atari Episode Length", episode_infos["l"])
+
+                if done:
+                    if episode_reward >= args.reward_threshold:
+                        save_episode_obs.append(ep_obs)
+                        save_episode_acts.append(ep_acts)
+                    ep_obs, ep_acts = [], []
+                else:
+                    ep_obs.append(obs)
 
                 if done and not is_atari and args.verbose > 0:
                     # NOTE: for env using VecNormalize, the mean reward
