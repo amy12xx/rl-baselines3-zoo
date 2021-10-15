@@ -62,6 +62,7 @@ def main():  # noqa: C901
     )
     parser.add_argument("--save-episodes", action="store_true", default=False, help="Save episodes")
     parser.add_argument("--reward-threshold", help="Reward threshold", type=int, default=0)
+    parser.add_argument("--img-obs", help="Save observations as images", action="store_true", default=False)
     args = parser.parse_args()
 
     # Going through custom gym packages to let them register in the global registory
@@ -184,6 +185,9 @@ def main():  # noqa: C901
 
     obs = env.reset()
     ep_obs.append(obs["observation"])
+#    img_obs = env.render("rgb_array")
+#    print(img_obs.shape)
+#    ep_obs.append(img_obs)
 
     # Deterministic by default except for atari games
     stochastic = args.stochastic or is_atari and not args.deterministic
@@ -226,6 +230,7 @@ def main():  # noqa: C901
                     ep_obs.append(obs["observation"])
                 else:
                     ep_obs.append(obs["observation"])
+#                ep_obs.append(env.render("rgb_array"))
 
                 if done and not is_atari and args.verbose > 0:
                     # NOTE: for env using VecNormalize, the mean reward
@@ -266,6 +271,7 @@ def main():  # noqa: C901
     print("Saving episodes...")
     save_episode_obs = [obs for ep in save_episode_obs for obs in ep]
     save_episode_acts = [act for ep in save_episode_acts for act in ep]
+#    print(save_episode_obs)
     obs = np.array(save_episode_obs)
     acts = np.array(save_episode_acts)
     print(obs.shape, acts.shape)
@@ -273,6 +279,7 @@ def main():  # noqa: C901
     acts = acts.reshape(len(acts), -1)
     print(obs.shape, acts.shape)
     episodes = np.hstack((obs, acts))
+    episodes = obs
     print("Episode shape: ", episodes.shape)
     np.save("{}/expert_{}".format(log_path, args.env), episodes)
 
