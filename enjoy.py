@@ -7,6 +7,7 @@ import sys
 import numpy as np
 import torch as th
 import yaml
+from gym import spaces
 from stable_baselines3.common.utils import set_random_seed
 
 import utils.import_envs  # noqa: F401 pylint: disable=unused-import
@@ -184,10 +185,13 @@ def main():  # noqa: C901
     ep_obs, ep_acts = [], []
 
     obs = env.reset()
-    ep_obs.append(obs["observation"])
-#    img_obs = env.render("rgb_array")
-#    print(img_obs.shape)
-#    ep_obs.append(img_obs)
+
+    # to save observations from Fetch env
+    if args.img_obs:
+        img_obs = env.render("rgb_array")
+        ep_obs.append(img_obs)
+    else:
+        ep_obs.append(obs["observation"])
 
     # Deterministic by default except for atari games
     stochastic = args.stochastic or is_atari and not args.deterministic
@@ -227,10 +231,11 @@ def main():  # noqa: C901
                         save_episode_acts.append(ep_acts)
                     ep_obs, ep_acts = [], []
                     obs = env.reset()
-                    ep_obs.append(obs["observation"])
+                if args.img_obs:
+                    img_obs = env.render("rgb_array")
+                    ep_obs.append(img_obs)
                 else:
                     ep_obs.append(obs["observation"])
-#                ep_obs.append(env.render("rgb_array"))
 
                 if done and not is_atari and args.verbose > 0:
                     # NOTE: for env using VecNormalize, the mean reward
@@ -271,15 +276,15 @@ def main():  # noqa: C901
     print("Saving episodes...")
     save_episode_obs = [obs for ep in save_episode_obs for obs in ep]
     save_episode_acts = [act for ep in save_episode_acts for act in ep]
-#    print(save_episode_obs)
     obs = np.array(save_episode_obs)
     acts = np.array(save_episode_acts)
-    print(obs.shape, acts.shape)
+
     obs = obs.reshape(len(obs), -1)
     acts = acts.reshape(len(acts), -1)
-    print(obs.shape, acts.shape)
-    episodes = np.hstack((obs, acts))
-    episodes = obs
+    if args.img_obs:
+        episodes = obs
+    else:
+        episodes = np.hstack((obs, acts))
     print("Episode shape: ", episodes.shape)
     np.save("{}/expert_{}".format(log_path, args.env), episodes)
 
