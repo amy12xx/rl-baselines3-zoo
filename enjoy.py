@@ -279,11 +279,11 @@ def main():  # noqa: C901
     obs = np.array(save_episode_obs)
     acts = np.array(save_episode_acts)
 
-    obs = obs.reshape(len(obs), -1)
-    acts = acts.reshape(len(acts), -1)
     if args.img_obs:
         episodes = obs
     else:
+        obs = obs.reshape(len(obs), -1)
+        acts = acts.reshape(len(acts), -1)
         episodes = np.hstack((obs, acts))
     print("Episode shape: ", episodes.shape)
     np.save("{}/expert_{}".format(log_path, args.env), episodes)
