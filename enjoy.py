@@ -9,7 +9,7 @@ import torch as th
 import yaml
 from gym import spaces
 from stable_baselines3.common.utils import set_random_seed
-
+from stable_baselines3.common.vec_env import VecFrameStack
 import utils.import_envs  # noqa: F401 pylint: disable=unused-import
 from utils import ALGOS, create_test_env, get_latest_run_id, get_saved_hyperparams
 from utils.exp_manager import ExperimentManager
@@ -64,6 +64,7 @@ def main():  # noqa: C901
     parser.add_argument("--save-episodes", action="store_true", default=False, help="Save episodes")
     parser.add_argument("--reward-threshold", help="Reward threshold", type=int, default=0)
     parser.add_argument("--img-obs", help="Save observations as images", action="store_true", default=False)
+    parser.add_argument("--frame-stack", help="Frame stacking", type=int, default=4)
     args = parser.parse_args()
 
     # Going through custom gym packages to let them register in the global registory
@@ -188,7 +189,9 @@ def main():  # noqa: C901
 
     # to save observations from Fetch env
     if args.img_obs:
+        env = VecFrameStack(env, n_stack=args.frame_stack)
         img_obs = env.render("rgb_array")
+        print(img_obs.shape)
         ep_obs.append(img_obs)
     else:
         ep_obs.append(obs["observation"])
