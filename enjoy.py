@@ -191,7 +191,6 @@ def main():  # noqa: C901
 
     # to save observations from Fetch env
     if args.img_obs:
-        env = VecFrameStack(env, n_stack=args.frame_stack)
         img_obs = env.render("rgb_array")
         ep_obs.append(img_obs)
     else:
