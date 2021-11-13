@@ -192,16 +192,23 @@ def main():  # noqa: C901
 
     log_dir = args.reward_log if args.reward_log != "" else None
 
-    env = create_test_env(
-        env_id,
-        n_envs=args.n_envs,
-        stats_path=stats_path,
-        seed=args.seed,
-        log_dir=log_dir,
-        should_render=not args.no_render,
-        hyperparams=hyperparams,
-        env_kwargs=env_kwargs,
-    )
+    temp_env = gym.make(env_id)
+    if isinstance(temp_env.observation_space, gym.spaces.dict.Dict):
+        if args.render_dim is not None:
+            env = DictObsWrapper(DictImgObsWrapper(temp_env, render_dim=args.render_dim))
+        else:
+            env = DictObsWrapper(DictImgObsWrapper(temp_env))
+    else:
+        env = create_test_env(
+            env_id,
+            n_envs=args.n_envs,
+            stats_path=stats_path,
+            seed=args.seed,
+            log_dir=log_dir,
+            should_render=not args.no_render,
+            hyperparams=hyperparams,
+            env_kwargs=env_kwargs,
+        )
 
     kwargs = dict(seed=args.seed)
     if algo in off_policy_algos:
@@ -226,12 +233,6 @@ def main():  # noqa: C901
     ep_obs, ep_acts = [], []
 
     obs = env.reset()
-
-    if isinstance(env.observation_space, gym.spaces.dict.Dict):
-        if args.render_dim is not None:
-            env = DictObsWrapper(DictImgObsWrapper(env, render_dim=args.render_dim))
-        else:
-            env = DictObsWrapper(DictImgObsWrapper(env))
 
     # to save observations from Fetch env
     if args.img_obs:
