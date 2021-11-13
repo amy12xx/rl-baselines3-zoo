@@ -65,6 +65,7 @@ def main():  # noqa: C901
     parser.add_argument("--reward-threshold", help="Reward threshold", type=int, default=0)
     parser.add_argument("--img-obs", help="Save observations as images", action="store_true", default=False)
     parser.add_argument("--frame-stack", help="Frame stacking", type=int, default=4)
+    parser.add_argument("--render-dim", help="Image dimensions", type=int, default=None)
     args = parser.parse_args()
 
     # Going through custom gym packages to let them register in the global registory
@@ -190,7 +191,10 @@ def main():  # noqa: C901
     # to save observations from Fetch env
     if args.img_obs:
         env = VecFrameStack(env, n_stack=args.frame_stack)
-        img_obs = env.render("rgb_array")
+        if args.render_dim is not None:
+            img_obs = env.render("rgb_array", args.render_dim)
+        else:
+            img_obs = env.render("rgb_array")
         print(img_obs.shape)
         ep_obs.append(img_obs)
     else:
@@ -235,7 +239,10 @@ def main():  # noqa: C901
                     ep_obs, ep_acts = [], []
                     obs = env.reset()
                 if args.img_obs:
-                    img_obs = env.render("rgb_array")
+                    if args.render_dim is not None:
+                        img_obs = env.render("rgb_array", args.render_dim)
+                    else:
+                        img_obs = env.render("rgb_array")
                     ep_obs.append(img_obs)
                 else:
                     ep_obs.append(obs["observation"])
