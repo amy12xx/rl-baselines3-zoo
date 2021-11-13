@@ -8,6 +8,7 @@ import numpy as np
 import torch as th
 import yaml
 import gym
+import cv2
 from gym import spaces
 from stable_baselines3.common.utils import set_random_seed
 from stable_baselines3.common.vec_env import VecFrameStack
@@ -192,6 +193,7 @@ def main():  # noqa: C901
     # to save observations from Fetch env
     if args.img_obs:
         img_obs = env.render("rgb_array")
+        img_obs = cv2.resize(img_obs, (240, 160), interpolation=cv2.INTER_CUBIC)
         ep_obs.append(img_obs)
     else:
         ep_obs.append(obs["observation"])
@@ -236,6 +238,7 @@ def main():  # noqa: C901
                     obs = env.reset()
                 if args.img_obs:
                     img_obs = env.render("rgb_array")
+                    img_obs = cv2.resize(img_obs, (240, 160), interpolation=cv2.INTER_CUBIC)
                     ep_obs.append(img_obs)
                 else:
                     ep_obs.append(obs["observation"])
