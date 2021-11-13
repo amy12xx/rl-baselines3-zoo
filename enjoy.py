@@ -17,44 +17,6 @@ from utils.exp_manager import ExperimentManager
 from utils.utils import StoreDict
 
 
-class DictImgObsWrapper(gym.core.ObservationWrapper):
-    """
-    Use the image as the only observation output.
-    """
-
-    def __init__(self, env, render_dim=500):
-        super().__init__(env)
-
-        self.render_dim = render_dim
-
-        self.observation_space = spaces.Box(
-            low=0, high=255, shape=(render_dim, render_dim, 3), dtype="uint8"
-        )
-
-    def observation(self, obs):
-        env = self.unwrapped
-
-        rgb_img = env.render(
-            mode="rgb_array", width=self.render_dim, height=self.render_dim
-        )
-
-        return rgb_img
-
-
-class DictObsWrapper(gym.core.ObservationWrapper):
-    """
-    Use only observation output.
-    """
-
-    def __init__(self, env):
-        super().__init__(env)
-
-        self.observation_space = env.observation_space.spaces["observation"]
-
-    def observation(self, obs):
-        return obs["observation"]
-
-
 def main():  # noqa: C901
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", help="environment ID", type=str, default="CartPole-v1")
@@ -236,7 +198,8 @@ def main():  # noqa: C901
     # to save observations from Fetch env
     if args.img_obs:
         env = VecFrameStack(env, n_stack=args.frame_stack)
-        ep_obs.append(obs)
+        img_obs = env.render("rgb_array")
+        ep_obs.append(img_obs)
     else:
         ep_obs.append(obs["observation"])
 
@@ -279,7 +242,8 @@ def main():  # noqa: C901
                     ep_obs, ep_acts = [], []
                     obs = env.reset()
                 if args.img_obs:
-                    ep_obs.append(obs)
+                    img_obs = env.render("rgb_array")
+                    ep_obs.append(img_obs)
                 else:
                     ep_obs.append(obs["observation"])
 
