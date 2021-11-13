@@ -195,7 +195,7 @@ def main():  # noqa: C901
         img_obs = env.render("rgb_array")
         if args.render_dim is not None:
             img_obs = cv2.resize(img_obs, (args.render_dim, args.render_dim), interpolation=cv2.INTER_CUBIC)
-            img_obs = np.float32(img_obs)
+            img_obs = img_obs.astype(np.uint8)
         ep_obs.append(img_obs)
     else:
         ep_obs.append(obs["observation"])
@@ -242,7 +242,7 @@ def main():  # noqa: C901
                     img_obs = env.render("rgb_array")
                     if args.render_dim is not None:
                         img_obs = cv2.resize(img_obs, (args.render_dim, args.render_dim), interpolation=cv2.INTER_CUBIC)
-                        img_obs = np.float32(img_obs)
+                        img_obs = img_obs.astype(np.uint8)
                     ep_obs.append(img_obs)
                 else:
                     ep_obs.append(obs["observation"])
