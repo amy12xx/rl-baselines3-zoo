@@ -67,7 +67,7 @@ def main():  # noqa: C901
     parser.add_argument("--reward-threshold", help="Reward threshold", type=int, default=0)
     parser.add_argument("--img-obs", help="Save observations as images", action="store_true", default=False)
     parser.add_argument("--frame-stack", help="Frame stacking", type=int, default=4)
-    parser.add_argument("--render-dim", help="Image dimensions", type=tuple, default=None)
+    parser.add_argument("--render-dim", help="Image dimensions", type=tuple, default=(250, 250))
     args = parser.parse_args()
 
     # Going through custom gym packages to let them register in the global registory
