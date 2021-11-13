@@ -189,12 +189,6 @@ def main():  # noqa: C901
 
     obs = env.reset()
 
-    if isinstance(env.observation_space, gym.spaces.dict.Dict):
-        if args.render_dim is not None:
-            env = DictObsWrapper(DictImgObsWrapper(env, render_dim=args.render_dim))
-        else:
-            env = DictObsWrapper(DictImgObsWrapper(env))
-
     # to save observations from Fetch env
     if args.img_obs:
         env = VecFrameStack(env, n_stack=args.frame_stack)
