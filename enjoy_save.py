@@ -41,20 +41,6 @@ class DictImgObsWrapper(gym.core.ObservationWrapper):
         return rgb_img
 
 
-class DictObsWrapper(gym.core.ObservationWrapper):
-    """
-    Use only observation output.
-    """
-
-    def __init__(self, env):
-        super().__init__(env)
-
-        self.observation_space = env.observation_space.spaces["observation"]
-
-    def observation(self, obs):
-        return obs["observation"]
-
-
 def main():  # noqa: C901
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", help="environment ID", type=str, default="CartPole-v1")
@@ -195,9 +181,9 @@ def main():  # noqa: C901
     temp_env = gym.make(env_id)
     if isinstance(temp_env.observation_space, gym.spaces.dict.Dict):
         if args.render_dim is not None:
-            env = DictObsWrapper(DictImgObsWrapper(temp_env, render_dim=args.render_dim))
+            env = DictImgObsWrapper(temp_env, render_dim=args.render_dim)
         else:
-            env = DictObsWrapper(DictImgObsWrapper(temp_env))
+            env = DictImgObsWrapper(temp_env)
     else:
         env = create_test_env(
             env_id,
