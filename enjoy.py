@@ -192,10 +192,12 @@ def main():  # noqa: C901
 
     # to save observations from Fetch env
     if args.img_obs:
-        img_obs = env.render("rgb_array")
         if args.render_dim is not None:
-            img_obs = cv2.resize(img_obs, (args.render_dim, args.render_dim), interpolation=cv2.INTER_CUBIC)
+            img_obs = env.render("rgb_array", width=args.render_dim, height=args.render_dim)
+            # img_obs = cv2.resize(img_obs, (args.render_dim, args.render_dim), interpolation=cv2.INTER_CUBIC)
             img_obs = img_obs.astype(np.uint8)
+        else:
+            img_obs = env.render("rgb_array")
         ep_obs.append(img_obs)
     else:
         ep_obs.append(obs["observation"])
@@ -239,10 +241,13 @@ def main():  # noqa: C901
                     ep_obs, ep_acts = [], []
                     obs = env.reset()
                 if args.img_obs:
-                    img_obs = env.render("rgb_array")
+                    # img_obs = env.render("rgb_array")
                     if args.render_dim is not None:
-                        img_obs = cv2.resize(img_obs, (args.render_dim, args.render_dim), interpolation=cv2.INTER_CUBIC)
+                        img_obs = env.render("rgb_array", width=args.render_dim, height=args.render_dim)
+                        # img_obs = cv2.resize(img_obs, (args.render_dim, args.render_dim), interpolation=cv2.INTER_CUBIC)
                         img_obs = img_obs.astype(np.uint8)
+                    else:
+                        img_obs = env.render("rgb_array")
                     ep_obs.append(img_obs)
                 else:
                     ep_obs.append(obs["observation"])

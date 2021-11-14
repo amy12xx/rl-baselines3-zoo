@@ -14,6 +14,7 @@ from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.sb2_compat.rmsprop_tf_like import RMSpropTFLike  # noqa: F401
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecEnv, VecFrameStack, VecNormalize
+from utils import fetch_vec_env
 
 # For custom activation fn
 from torch import nn as nn  # noqa: F401 pylint: disable=unused-import
@@ -209,6 +210,8 @@ def create_test_env(
         # as Pybullet envs does not follow gym.render() interface
         vec_env_cls = SubprocVecEnv
         # start_method = 'spawn' for thread safe
+    if ExperimentManager.is_robotics_env(env_id):
+        vec_env_cls = FetchVecEnv
 
     env = make_vec_env(
         env_id,
