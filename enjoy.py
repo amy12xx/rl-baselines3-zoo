@@ -68,6 +68,7 @@ def main():  # noqa: C901
     parser.add_argument("--img-obs", help="Save observations as images", action="store_true", default=False)
     parser.add_argument("--frame-stack", help="Frame stacking", type=int, default=4)
     parser.add_argument("--render-dim", help="Image dimensions", type=int, default=None)
+    parser.add_argument("--dense-reward", help="If dense reward, done flag will not be checked while saving trajectories", action="store_true", default=False)
     args = parser.parse_args()
 
     # Going through custom gym packages to let them register in the global registory
@@ -192,13 +193,16 @@ def main():  # noqa: C901
 
     # to save observations from Fetch env
     if args.img_obs:
-        if args.render_dim is not None:
+        if is_atari:
+            ep_obs.append(obs)
+        elif args.render_dim is not None:
             img_obs = env.render("rgb_array", width=args.render_dim, height=args.render_dim)
             # img_obs = cv2.resize(img_obs, (args.render_dim, args.render_dim), interpolation=cv2.INTER_CUBIC)
             img_obs = img_obs.astype(np.uint8)
+            ep_obs.append(img_obs)
         else:
             img_obs = env.render("rgb_array")
-        ep_obs.append(img_obs)
+            ep_obs.append(img_obs)
     else:
         ep_obs.append(obs["observation"])
 
@@ -212,6 +216,8 @@ def main():  # noqa: C901
     ep_len = 0
     # For HER, monitor success rate
     successes = []
+
+    print("Running for {} timesteps".format(args.n_timesteps))
     try:
         for _ in range(args.n_timesteps):
             action, state = model.predict(obs, state=state, deterministic=deterministic)
@@ -224,6 +230,8 @@ def main():  # noqa: C901
             episode_reward += reward[0]
             ep_len += 1
 
+            print("rew {}, len {}, done {}".format(episode_reward, ep_len, done))
+
             if args.n_envs == 1:
                 # For atari the return reward is not the atari score
                 # so we have to get it from the infos dict
@@ -234,21 +242,31 @@ def main():  # noqa: C901
                         print("Atari Episode Length", episode_infos["l"])
 
                 if done:
+                    print("Episode reward: {}".format(episode_reward))
                     if episode_reward >= args.reward_threshold:
                         assert len(ep_obs) == len(ep_acts), "len not same: {}, {}".format(len(ep_obs), len(ep_acts))
                         save_episode_obs.append(ep_obs)
                         save_episode_acts.append(ep_acts)
                     ep_obs, ep_acts = [], []
                     obs = env.reset()
+                elif args.dense_reward:
+                    if episode_reward >= args.reward_threshold:
+                        print("Episode reward: {}".format(episode_reward))
+                        save_episode_obs.append(ep_obs)
+                        save_episode_acts.append(ep_acts)
+                    ep_obs, ep_acts = [], []
                 if args.img_obs:
                     # img_obs = env.render("rgb_array")
-                    if args.render_dim is not None:
+                    if is_atari:
+                        ep_obs.append(obs)
+                    elif args.render_dim is not None:
                         img_obs = env.render("rgb_array", width=args.render_dim, height=args.render_dim)
                         # img_obs = cv2.resize(img_obs, (args.render_dim, args.render_dim), interpolation=cv2.INTER_CUBIC)
                         img_obs = img_obs.astype(np.uint8)
+                        ep_obs.append(img_obs)
                     else:
                         img_obs = env.render("rgb_array")
-                    ep_obs.append(img_obs)
+                        ep_obs.append(img_obs)
                 else:
                     ep_obs.append(obs["observation"])
 
@@ -272,7 +290,9 @@ def main():  # noqa: C901
                         successes.append(infos[0].get("is_success", False))
                         episode_reward, ep_len = 0.0, 0
 
-    except KeyboardInterrupt:
+    # except KeyboardInterrupt:
+    except Exception as e:
+        print("ERROR: ", e)
         pass
 
     if args.verbose > 0 and len(successes) > 0:
