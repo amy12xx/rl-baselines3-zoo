@@ -42,6 +42,14 @@ def update_stacked_obs(observations, stackedobs, stack_dimension=-1):
     return stackedobs
 
 
+def get_img(env, render_dim):
+    try:
+        img_obs = env.render("rgb_array", width=render_dim, height=render_dim)
+    except:
+        img_obs = env.render("rgb_array")
+        img_obs = cv2.resize(img_obs, (render_dim, render_dim), interpolation=cv2.INTER_CUBIC)
+    return img_obs
+
 def main():  # noqa: C901
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", help="environment ID", type=str, default="CartPole-v1")
@@ -228,8 +236,7 @@ def main():  # noqa: C901
             stackedobs = update_stacked_obs(obs, stackedobs)
             ep_stacked_obs.append(stackedobs)
         elif args.render_dim is not None:
-            img_obs = env.render("rgb_array", width=args.render_dim, height=args.render_dim)
-            # img_obs = cv2.resize(img_obs, (args.render_dim, args.render_dim), interpolation=cv2.INTER_CUBIC)
+            img_obs = get_img(env, args.render_dim)
             img_obs = img_obs.astype(np.uint8)
             ep_obs.append(img_obs)
             stackedobs = update_stacked_obs(img_obs, stackedobs)
@@ -303,8 +310,7 @@ def main():  # noqa: C901
                         stackedobs = update_stacked_obs(obs, stackedobs)
                         ep_stacked_obs.append(stackedobs)
                     elif args.render_dim is not None:
-                        img_obs = env.render("rgb_array", width=args.render_dim, height=args.render_dim)
-                        # img_obs = cv2.resize(img_obs, (args.render_dim, args.render_dim), interpolation=cv2.INTER_CUBIC)
+                        img_obs = get_img(env, args.render_dim)
                         img_obs = img_obs.astype(np.uint8)
                         ep_obs.append(img_obs)
                         stackedobs = update_stacked_obs(img_obs, stackedobs)
