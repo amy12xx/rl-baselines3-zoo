@@ -15,7 +15,7 @@ from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.sb2_compat.rmsprop_tf_like import RMSpropTFLike  # noqa: F401
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecFrameStack
 from utils.fetch_vec_env import FetchVecEnv
-# from utils.vec_normalize import VecNormalize
+from utils.vec_normalize import VecNormalize
 from utils.base_vec_env import VecEnv
 
 # For custom activation fn
@@ -242,6 +242,8 @@ def create_test_env(
                 env.norm_reward = False
             else:
                 raise ValueError(f"VecNormalize stats {path_} not found")
+
+            print(env.render("rgb_array", 50, 50))
 
         n_stack = hyperparams.get("frame_stack", 0)
         if n_stack > 0:
