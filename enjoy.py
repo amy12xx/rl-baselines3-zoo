@@ -210,6 +210,7 @@ def main():  # noqa: C901
     model = ALGOS[algo].load(model_path, env=env, custom_objects=custom_objects, **kwargs)
 
     save_episode_obs, save_episode_acts = [], []
+    save_episode_stackedobs = []
     ep_obs, ep_acts = [], []
 
     channels_first, stack_dimension, stackedobs, repeat_axis = compute_stacking(1, args.frame_stack)
@@ -228,16 +229,16 @@ def main():  # noqa: C901
             # img_obs = cv2.resize(img_obs, (args.render_dim, args.render_dim), interpolation=cv2.INTER_CUBIC)
             img_obs = img_obs.astype(np.uint8)
             ep_obs.append(img_obs)
-            stackedobs = update_stacked_obs(obs, stackedobs)
+            stackedobs = update_stacked_obs(img_obs, stackedobs)
             ep_stacked_obs.append(stackedobs)
         else:
             img_obs = env.render("rgb_array")
             ep_obs.append(img_obs)
-            stackedobs = update_stacked_obs(obs, stackedobs)
+            stackedobs = update_stacked_obs(img_obs, stackedobs)
             ep_stacked_obs.append(stackedobs)
     else:
         ep_obs.append(obs["observation"])
-        stackedobs = update_stacked_obs(obs, stackedobs)
+        stackedobs = update_stacked_obs(obs["observation"], stackedobs)
         ep_stacked_obs.append(stackedobs)
 
     # Deterministic by default except for atari games
@@ -274,42 +275,45 @@ def main():  # noqa: C901
                     if episode_infos is not None:
                         print(f"Atari Episode Score: {episode_infos['r']:.2f}")
                         print("Atari Episode Length", episode_infos["l"])
-
                 if done:
                     print("Episode reward: {}".format(episode_reward))
                     if episode_reward >= args.reward_threshold:
                         assert len(ep_obs) == len(ep_acts), "len not same: {}, {}".format(len(ep_obs), len(ep_acts))
                         save_episode_obs.append(ep_obs)
                         save_episode_acts.append(ep_acts)
+                        save_episode_stackedobs.append(ep_stacked_obs)
                     ep_obs, ep_acts = [], []
+                    ep_stacked_obs = []
                     obs = env.reset()
                 elif args.dense_reward:
                     if episode_reward >= args.reward_threshold:
                         print("Episode reward: {}".format(episode_reward))
                         save_episode_obs.append(ep_obs)
                         save_episode_acts.append(ep_acts)
+                        save_episode_stackedobs.append(ep_stacked_obs)
                     ep_obs, ep_acts = [], []
+                    ep_stacked_obs = []
                 if args.img_obs:
                     # img_obs = env.render("rgb_array")
                     if is_atari:
                         ep_obs.append(obs)
-                        stackedobs = update_stacked_obs(obs)
+                        stackedobs = update_stacked_obs(obs, stackedobs)
                         ep_stacked_obs.append(stackedobs)
                     elif args.render_dim is not None:
                         img_obs = env.render("rgb_array", width=args.render_dim, height=args.render_dim)
                         # img_obs = cv2.resize(img_obs, (args.render_dim, args.render_dim), interpolation=cv2.INTER_CUBIC)
                         img_obs = img_obs.astype(np.uint8)
                         ep_obs.append(img_obs)
-                        stackedobs = update_stacked_obs(img_obs)
+                        stackedobs = update_stacked_obs(img_obs, stackedobs)
                         ep_stacked_obs.append(stackedobs)
                     else:
                         img_obs = env.render("rgb_array")
                         ep_obs.append(img_obs)
-                        stackedobs = update_stacked_obs(img_obs)
+                        stackedobs = update_stacked_obs(img_obs, stackedobs)
                         ep_stacked_obs.append(stackedobs)
                 else:
                     ep_obs.append(obs["observation"])
-                    stackedobs = update_stacked_obs(obs["observation"])
+                    stackedobs = update_stacked_obs(obs["observation"], stackedobs)
                     ep_stacked_obs.append(stackedobs)
 
                 if done and not is_atari and args.verbose > 0:
