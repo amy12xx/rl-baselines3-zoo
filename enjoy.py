@@ -18,6 +18,28 @@ from utils.exp_manager import ExperimentManager
 from utils.utils import StoreDict
 
 
+def compute_stacking(
+        num_envs: int,
+        n_stack: int,
+        ) -> Tuple[bool, int, np.ndarray, int]:
+        channels_first = False
+
+        # This includes the vec-env dimension (first)
+        stack_dimension = 1 if channels_first else -1
+        repeat_axis = 0 if channels_first else -1
+        low = np.repeat(0, n_stack, axis=repeat_axis)
+        stackedobs = np.zeros((num_envs,) + low.shape, low.dtype)
+        return channels_first, stack_dimension, stackedobs, repeat_axis
+
+
+def update_stacked_obs(observations, stackedobs, stack_dimension=-1):
+    stack_ax_size = observations.shape[stack_dimension]
+    stackedobs = np.roll(stackedobs, shift=-stack_ax_size, axis=stack_dimension)
+    stackedobs[..., -observations.shape[stack_dimension]:] = observations
+
+    return stackedobs
+
+
 def main():  # noqa: C901
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", help="environment ID", type=str, default="CartPole-v1")
@@ -189,22 +211,33 @@ def main():  # noqa: C901
     save_episode_obs, save_episode_acts = [], []
     ep_obs, ep_acts = [], []
 
+    channels_first, stack_dimension, stackedobs, repeat_axis = compute_stacking(1, args.frame_stack)
+    ep_stacked_obs = []
+
     obs = env.reset()
 
     # to save observations from Fetch env
     if args.img_obs:
         if is_atari:
             ep_obs.append(obs)
+            stackedobs = update_stacked_obs(obs, stackedobs)
+            ep_stacked_obs.append(stackedobs)
         elif args.render_dim is not None:
             img_obs = env.render("rgb_array", width=args.render_dim, height=args.render_dim)
             # img_obs = cv2.resize(img_obs, (args.render_dim, args.render_dim), interpolation=cv2.INTER_CUBIC)
             img_obs = img_obs.astype(np.uint8)
             ep_obs.append(img_obs)
+            stackedobs = update_stacked_obs(obs, stackedobs)
+            ep_stacked_obs.append(stackedobs)
         else:
             img_obs = env.render("rgb_array")
             ep_obs.append(img_obs)
+            stackedobs = update_stacked_obs(obs, stackedobs)
+            ep_stacked_obs.append(stackedobs)
     else:
         ep_obs.append(obs["observation"])
+        stackedobs = update_stacked_obs(obs, stackedobs)
+        ep_stacked_obs.append(stackedobs)
 
     # Deterministic by default except for atari games
     stochastic = args.stochastic or is_atari and not args.deterministic
@@ -259,16 +292,24 @@ def main():  # noqa: C901
                     # img_obs = env.render("rgb_array")
                     if is_atari:
                         ep_obs.append(obs)
+                        stackedobs = update_stacked_obs(obs)
+                        ep_stacked_obs.append(stackedobs)
                     elif args.render_dim is not None:
                         img_obs = env.render("rgb_array", width=args.render_dim, height=args.render_dim)
                         # img_obs = cv2.resize(img_obs, (args.render_dim, args.render_dim), interpolation=cv2.INTER_CUBIC)
                         img_obs = img_obs.astype(np.uint8)
                         ep_obs.append(img_obs)
+                        stackedobs = update_stacked_obs(img_obs)
+                        ep_stacked_obs.append(stackedobs)
                     else:
                         img_obs = env.render("rgb_array")
                         ep_obs.append(img_obs)
+                        stackedobs = update_stacked_obs(img_obs)
+                        ep_stacked_obs.append(stackedobs)
                 else:
                     ep_obs.append(obs["observation"])
+                    stackedobs = update_stacked_obs(obs["observation"])
+                    ep_stacked_obs.append(stackedobs)
 
                 if done and not is_atari and args.verbose > 0:
                     # NOTE: for env using VecNormalize, the mean reward
@@ -313,6 +354,8 @@ def main():  # noqa: C901
     save_episode_acts = [act for ep in save_episode_acts for act in ep]
     obs = np.array(save_episode_obs)
     acts = np.array(save_episode_acts)
+
+    print(obs.shape)
 
     if args.img_obs:
         episodes = obs
