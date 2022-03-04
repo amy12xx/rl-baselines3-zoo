@@ -192,6 +192,11 @@ def main():  # noqa: C901
         hyperparams=hyperparams,
         env_kwargs=env_kwargs,
     )
+    try:
+        num_envs = env.num_envs
+        print(num_envs)
+    except:
+        pass
 
     kwargs = dict(seed=args.seed)
     if algo in off_policy_algos:
