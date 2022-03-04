@@ -281,6 +281,7 @@ class VecEnvWrapper(VecEnv):
         return self.venv.close()
 
     def render(self, mode: str = "human", width=500, height=500) -> Optional[np.ndarray]:
+        print("Insider VecEnvWrapper render")
         return self.venv.render(mode=mode, width=500, height=500)
 
     def get_images(self) -> Sequence[np.ndarray]:
