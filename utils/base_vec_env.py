@@ -179,6 +179,7 @@ class VecEnv(ABC):
             warnings.warn(f"Render not defined for {self}")
             return
 
+        print("Inside VecEnv render")
         if self.num_envs == 1:
             return self.unwrapped().render(mode, width, height)
 

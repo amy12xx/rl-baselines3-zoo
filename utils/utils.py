@@ -228,8 +228,6 @@ def create_test_env(
         vec_env_kwargs=vec_env_kwargs,
     )
 
-    print(env.render("rgb_array", 50, 50))
-
     # Load saved stats for normalizing input and rewards
     # And optionally stack frames
     if stats_path is not None:
