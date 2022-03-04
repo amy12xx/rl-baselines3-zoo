@@ -162,6 +162,8 @@ def main():  # noqa: C901
         th.set_num_threads(args.num_threads)
 
     is_atari = ExperimentManager.is_atari(env_id)
+    is_robotics = ExperimentManager.is_robotics_env(env_id)
+    print("is_atari={}, is_robotics={}".format(is_atari, is_robotics))
 
     stats_path = os.path.join(log_path, env_id)
     hyperparams, stats_path = get_saved_hyperparams(stats_path, norm_reward=args.norm_reward, test_mode=True)
