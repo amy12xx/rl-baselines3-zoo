@@ -179,6 +179,9 @@ class VecEnv(ABC):
             warnings.warn(f"Render not defined for {self}")
             return
 
+        if self.num_envs == 1:
+            return self.unwrapped().render(mode, width, height)
+
         # Create a big image by tiling images from subprocesses
         bigimg = tile_images(imgs)
         if mode == "human":
@@ -277,8 +280,8 @@ class VecEnvWrapper(VecEnv):
     def close(self) -> None:
         return self.venv.close()
 
-    def render(self, mode: str = "human") -> Optional[np.ndarray]:
-        return self.venv.render(mode=mode)
+    def render(self, mode: str = "human", width=500, height=500) -> Optional[np.ndarray]:
+        return self.venv.render(mode=mode, width=500, height=500)
 
     def get_images(self) -> Sequence[np.ndarray]:
         return self.venv.get_images()
