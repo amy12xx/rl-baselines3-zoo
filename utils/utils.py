@@ -13,8 +13,8 @@ from stable_baselines3 import A2C, DDPG, DQN, PPO, SAC, TD3
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.sb2_compat.rmsprop_tf_like import RMSpropTFLike  # noqa: F401
-from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecEnv, VecFrameStack, VecNormalize
-from utils.fetch_vec_env import FetchVecEnv
+from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecEnv, VecFrameStack
+from utils.fetch_vec_env import FetchVecEnv, VecNormalize
 
 # For custom activation fn
 from torch import nn as nn  # noqa: F401 pylint: disable=unused-import
@@ -242,7 +242,7 @@ def create_test_env(
                 raise ValueError(f"VecNormalize stats {path_} not found")
 
         n_stack = hyperparams.get("frame_stack", 0)
-        if n_stack > 0 and not ExperimentManager.is_robotics_env(env_id):
+        if n_stack > 0:
             print(f"Stacking {n_stack} frames")
             env = VecFrameStack(env, n_stack)
     return env
