@@ -8,8 +8,8 @@ import numpy as np
 
 from stable_baselines3.common import utils
 from stable_baselines3.common.running_mean_std import RunningMeanStd
-from stable_baselines3.common.vec_env.base_vec_env import VecEnv, VecEnvStepReturn
-from utils.base_vec_env import VecEnvWrapper
+from stable_baselines3.common.vec_env.base_vec_env import VecEnvStepReturn
+from utils.base_vec_env import VecEnvWrapper, VecEnv
 
 
 class VecNormalize(VecEnvWrapper):

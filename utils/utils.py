@@ -244,6 +244,7 @@ def create_test_env(
                 raise ValueError(f"VecNormalize stats {path_} not found")
 
         n_stack = hyperparams.get("frame_stack", 0)
+        print("N stack: ", n_stack)
         if n_stack > 0:
             print(f"Stacking {n_stack} frames")
             env = VecFrameStack(env, n_stack)
