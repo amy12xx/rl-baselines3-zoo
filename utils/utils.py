@@ -243,8 +243,6 @@ def create_test_env(
             else:
                 raise ValueError(f"VecNormalize stats {path_} not found")
 
-            print(env.render("rgb_array", 50, 50))
-
         n_stack = hyperparams.get("frame_stack", 0)
         if n_stack > 0:
             print(f"Stacking {n_stack} frames")

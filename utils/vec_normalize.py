@@ -295,3 +295,7 @@ class VecNormalize(VecEnvWrapper):
     def ret(self) -> np.ndarray:
         warnings.warn("`VecNormalize` `ret` attribute is deprecated. Please use `returns` instead.", DeprecationWarning)
         return self.returns
+
+    def render(self, mode: str = "human", width=500, height=500) -> Optional[np.ndarray]:
+        print("Insider VecEnvWrapper render")
+        return self.venv.render(mode=mode, width=500, height=500)
