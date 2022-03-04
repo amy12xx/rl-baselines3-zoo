@@ -361,7 +361,10 @@ def main():  # noqa: C901
     obs = np.array(save_episode_obs)
     acts = np.array(save_episode_acts)
 
-    print(obs.shape)
+    save_episode_stackedobs = [obs for ep in save_episode_stackedobs for obs in ep]
+    stackedobs = np.array(save_episode_stackedobs)
+
+    print(stackedobs.shape)
 
     if args.img_obs:
         episodes = obs
