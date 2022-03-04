@@ -22,17 +22,15 @@ from utils.utils import StoreDict
 def compute_stacking(
         num_envs: int,
         n_stack: int,
-        observation_space: spaces.Box,
+        render_dim: int,
         ) -> Tuple[bool, int, np.ndarray, int]:
         channels_first = False
 
         # This includes the vec-env dimension (first)
         stack_dimension = 1 if channels_first else -1
         repeat_axis = 0 if channels_first else -1
-        low = np.repeat(0, n_stack, axis=repeat_axis)
+        low = np.repeat((render_dim, render_dim, 3), n_stack, axis=repeat_axis)
         stackedobs = np.zeros((num_envs,) + low.shape, low.dtype)
-        print(low)
-        print(stackedobs.shape)
         return channels_first, stack_dimension, stackedobs, repeat_axis
 
 
@@ -216,7 +214,7 @@ def main():  # noqa: C901
     save_episode_stackedobs = []
     ep_obs, ep_acts = [], []
 
-    channels_first, stack_dimension, stackedobs, repeat_axis = compute_stacking(1, args.frame_stack, env.observation_space.spaces["observation"])
+    channels_first, stack_dimension, stackedobs, repeat_axis = compute_stacking(1, args.frame_stack, args.render_dim)
     ep_stacked_obs = []
 
     obs = env.reset()
