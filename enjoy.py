@@ -31,6 +31,7 @@ def compute_stacking(
         repeat_axis = 0 if channels_first else -1
         low = np.repeat(observation_space.low, n_stack, axis=repeat_axis)
         stackedobs = np.zeros((num_envs,) + low.shape, low.dtype)
+        print(observation_space)
         print(low)
         print(stackedobs.shape)
         return channels_first, stack_dimension, stackedobs, repeat_axis
