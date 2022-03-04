@@ -242,7 +242,7 @@ def create_test_env(
                 raise ValueError(f"VecNormalize stats {path_} not found")
 
         n_stack = hyperparams.get("frame_stack", 0)
-        if n_stack > 0:
+        if n_stack > 0 and not ExperimentManager.is_robotics_env(env_id):
             print(f"Stacking {n_stack} frames")
             env = VecFrameStack(env, n_stack)
     return env
