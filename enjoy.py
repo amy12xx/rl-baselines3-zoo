@@ -214,7 +214,7 @@ def main():  # noqa: C901
     save_episode_stackedobs = []
     ep_obs, ep_acts = [], []
 
-    channels_first, stack_dimension, stackedobs, repeat_axis = compute_stacking(1, args.frame_stack)
+    channels_first, stack_dimension, stackedobs, repeat_axis = compute_stacking(1, args.frame_stack, env.observation_space.spaces["observation"])
     ep_stacked_obs = []
 
     obs = env.reset()
