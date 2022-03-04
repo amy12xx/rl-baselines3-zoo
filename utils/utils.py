@@ -14,7 +14,8 @@ from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.sb2_compat.rmsprop_tf_like import RMSpropTFLike  # noqa: F401
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecEnv, VecFrameStack
-from utils.fetch_vec_env import FetchVecEnv, VecNormalize
+from utils.fetch_vec_env import FetchVecEnv
+from utils.vec_normalize import VecNormalize
 
 # For custom activation fn
 from torch import nn as nn  # noqa: F401 pylint: disable=unused-import
