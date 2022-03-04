@@ -228,6 +228,8 @@ def create_test_env(
         vec_env_kwargs=vec_env_kwargs,
     )
 
+    print(env.render("rgb_array", 50, 50))
+
     # Load saved stats for normalizing input and rewards
     # And optionally stack frames
     if stats_path is not None:
@@ -244,7 +246,6 @@ def create_test_env(
                 raise ValueError(f"VecNormalize stats {path_} not found")
 
         n_stack = hyperparams.get("frame_stack", 0)
-        print("N stack: ", n_stack)
         if n_stack > 0:
             print(f"Stacking {n_stack} frames")
             env = VecFrameStack(env, n_stack)
