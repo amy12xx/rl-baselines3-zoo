@@ -186,7 +186,6 @@ def main():  # noqa: C901
     ep_obs, ep_next_obs, ep_acts = [], [], []
 
     obs = env.reset()
-    ep_obs.append(obs)
 
     # Deterministic by default except for atari games
     stochastic = args.stochastic or is_atari and not args.deterministic
@@ -200,6 +199,7 @@ def main():  # noqa: C901
     successes = []
     try:
         for _ in range(args.n_timesteps):
+            ep_obs.append(obs)
             action, state = model.predict(obs, state=state, deterministic=deterministic)
             obs, reward, done, infos = env.step(action)
             ep_acts.append(action)
